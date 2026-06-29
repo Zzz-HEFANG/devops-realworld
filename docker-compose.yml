@@ -3,15 +3,15 @@ services:
     image: postgres:16-alpine
     container_name: realworld-db
     environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
-      POSTGRES_DB: app
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5433:5432"
+      - "${DB_HOST_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -24,16 +24,15 @@ services:
     container_name: realworld-api
     environment:
       NODE_ENV: production
-      PORT: 3000
-      DATABASE_URL: postgresql://app:app@db:5432/app?schema=public
-      JWT_SECRET: dev-secret
-      HOST: 0.0.0.0
+      HOST: ${HOST}
+      PORT: ${API_PORT}
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
     ports:
-      - "3000:3000"
+      - "${API_PORT}:3000"
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   postgres_data:
-
